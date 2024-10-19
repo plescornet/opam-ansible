@@ -1,0 +1,24 @@
+---
+- name: Install OPAM switches
+  become: "{{ opam_install_location == 'system_wide' }}"
+  environment:
+    OPAMROOT: "{{ (opam_install_location == 'system_wide') | ternary(opam_root_system_wide, opam_root_user) }}"
+    OPAMROOTISOK: "true"
+  block:
+    - name: Create OPAM switch "{{ item.name }}"
+      ansible.builtin.command:
+        cmd: opam switch create {{ item.name }} {{ item.compiler }} --yes
+        creates: "{{ (opam_install_location == 'system_wide') | ternary(opam_root_system_wide, opam_root_user) }}/{{ item.name }}"
+      environment:
+        OPAMROOT: "{{ (opam_install_location == 'system_wide') | ternary(opam_root_system_wide, opam_root_user) }}"
+        OPAMROOTISOK: "true"
+      loop: "{{ opam_switches }}"
+
+    - name: Install packages for switch "{{ item.name }}"
+      ansible.builtin.command:
+        cmd: opam install --yes --switch={{ item.name }} {{ item.packages | join(' ') }}
+      register: opam_install_output
+      loop: "{{ opam_switches }}"
+      when: item.packages | length > 0
+      changed_when: "'=== install' in opam_install_output.stdout"
+      failed_when: "'[ERROR]' in opam_install_output.stdout or 'No solution found, exiting' in opam_install_output.stdout"

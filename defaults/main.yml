@@ -1,0 +1,44 @@
+---
+
+# set the default values for the role
+
+# Proxy settings
+http_proxy: ""
+https_proxy: ""
+
+
+# Installation method: 'package_manager' or 'direct' (using opam.ocaml.org/install.sh)
+opam_install_method: direct
+
+# If a package manager is used, the package name
+opam_package_name: opam
+
+# Force update opam (useful for direct installation)
+opam_force_update: false
+
+# Installation location: 'system_wide' or 'user'
+opam_install_location: system_wide
+
+opam_root_system_wide: /opt/opam
+opam_root_user: $HOME/.opam
+
+opam_switches:
+  - name: "default"
+    compiler: "4.14.2"
+    packages:
+      - dune
+      - tuareg
+      - ocaml-lsp-server
+      - utop
+      - ocamlformat
+      - user-setup
+      - jupyter
+  - name: "bleeding-edge"
+    compiler: "5.2.0"
+    packages:
+      - dune
+      - tuareg
+      - ocaml-lsp-server
+      - utop
+      - ocamlformat
+      - user-setup
