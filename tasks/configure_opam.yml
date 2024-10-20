@@ -28,14 +28,14 @@
         dest: /etc/X11/Xsession.d/99opam
         state: link
 
-    - name: Add block in /etc/bash.bashrc to source OPAM environment
-      ansible.builtin.blockinfile:
-        path: /etc/bash.bashrc
-        block: |
-          # OPAM configuration
-          if [ -f /etc/profile.d/opam.sh ]; then
-            . /etc/profile.d/opam.sh
-          fi
+    # - name: Add block in /etc/bash.bashrc to source OPAM environment
+    #   ansible.builtin.blockinfile:
+    #     path: /etc/bash.bashrc
+    #     block: |
+    #       # OPAM configuration
+    #       if [ -f /etc/profile.d/opam.sh ]; then
+    #         . /etc/profile.d/opam.sh
+    #       fi
 
     - name: Add OPAM environment to sudoers
       copy:
