@@ -1,5 +1,6 @@
 ---
 - name: Install and configure opam
+  become: true
   block:
     - name: Install opam if not already installed or if force update is true
       include_tasks: install_opam.yml

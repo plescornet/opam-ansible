@@ -1,7 +1,6 @@
 ---
 - name: Configure OPAM for system-wide installation
   when: opam_install_location == 'system_wide'
-  become: true
   block:
     - name: Initialize OPAM (system-wide)
       shell: |
@@ -45,6 +44,7 @@
 
 - name: Initialize OPAM for user-level installation
   when: opam_install_location == 'user'
+  become: false
   shell: |
     opam init --yes --shell-setup --bare
   register: opam_init_output

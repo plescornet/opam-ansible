@@ -1,0 +1,29 @@
+- name: Install OPAM switch "{{ item.name }}"
+  environment:
+    OPAMROOT: "{{ (opam_install_location == 'system_wide') | ternary(opam_root_system_wide, opam_root_user) }}"
+    OPAMROOTISOK: "true"
+  block:
+    # - name: Check if OPAM switch "{{ item.name }}" exists
+    #   ansible.builtin.command:
+    #     cmd: opam switch list --short
+    #   register: opam_switch_list
+    #   changed_when: false
+
+    - name: Create OPAM switch "{{ item.name }}"
+      ansible.builtin.command:
+        cmd: opam switch create {{ item.name }} {{ item.compiler }} --yes
+      register: opam_switch_create_output
+      # when: "item.name not in opam_switch_list.stdout"
+      changed_when: "'[ERROR]' in opam_switch_create_output.stdout and '[ERROR] There already is an installed switch named' not in opam_switch_create_output.stdout"
+      failed_when: "'[ERROR]' in opam_switch_create_output.stdout and '[ERROR] There already is an installed switch named' not in opam_switch_create_output.stdout"
+
+    - name: Install packages in each switch "{{ item.name }}"
+      ansible.builtin.command:
+        cmd: opam install --confirm-level=unsafe-yes --color=never --switch={{ item.name }} {{ item.packages | join(' ') }}
+      environment:
+        OPAMROOT: "{{ (opam_install_location == 'system_wide') | ternary(opam_root_system_wide, opam_root_user) }}"
+        OPAMROOTISOK: "true"
+      register: opam_install_output
+      when: item.packages | length > 0
+      changed_when: "'=== install' in opam_install_output.stdout"
+      failed_when: "'[ERROR]' in opam_install_output.stdout or 'No solution found, exiting' in opam_install_output.stdout"
