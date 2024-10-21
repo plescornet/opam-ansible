@@ -8,7 +8,7 @@ Requirements
 
 Executing this role **does not require opam installed**. The role will install opam for you.
 
-This role assumes you are using `bash`.
+~~This role assumes you are using `bash`.~~ (maybe not).
 
 If you want to install opam through the system package manager, you need to know the opam package manager name for your system. You can find it [here](https://opam.ocaml.org/doc/Install.html). If you want a direct installation from the official opam install script, you need curl available.
 
