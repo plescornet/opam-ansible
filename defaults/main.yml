@@ -10,6 +10,9 @@ opam_install_method: direct
 
 # If a package manager is used, the package name
 opam_package_name: opam
+opam_external_dependencies:
+  - patch
+  # the one I know may not be installed by default on some systems
 
 # Force update opam (useful for direct installation)
 opam_force_update: false
@@ -40,6 +43,7 @@ opam_switches:
       - utop
       - ocamlformat
       - user-setup
+
 ### should not be useful anymore thanks to the --confirm-level=unsafe-yes option in the opam install commands
 # opam_external_dependencies:
 #   - emacs-nw

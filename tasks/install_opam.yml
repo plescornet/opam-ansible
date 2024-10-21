@@ -1,4 +1,5 @@
 ---
+
 - name: Install opam using package manager
   when: opam_install_method == 'package_manager'
   package:
@@ -10,11 +11,16 @@
 
 - name: Install opam directly
   when: opam_install_method == 'direct'
-  expect:
-    command: bash -c "sh <(curl -fsSL https://opam.ocaml.org/install.sh)"
-    responses:
-      Where should it be installed ?: ""
-    timeout: 120
+  block:
+    - ansible.builtin.package:
+      name: "{{ item }}"
+      state: present
+      loop: "{{ opam_external_dependencies }}"
+    - expect:
+      command: bash -c "sh <(curl -fsSL https://opam.ocaml.org/install.sh)"
+      responses:
+        Where should it be installed ?: ""
+      timeout: 120
   environment:
     http_proxy: "{{ http_proxy }}"
     https_proxy: "{{ https_proxy }}"
