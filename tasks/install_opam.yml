@@ -19,3 +19,4 @@
         responses:
           Where should it be installed ?: ""
         timeout: 120
+        creates: "/usr/local/bin/opam"
