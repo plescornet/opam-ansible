@@ -43,16 +43,9 @@
         content: 'Defaults env_keep += "OPAMROOT OPAMROOTISOK"'
         mode: "0440"
 
-- name: Configure OPAM for user-level installation
+- name: Initialize OPAM for user-level installation
   when: opam_install_location == 'user'
-  block:
-    - name: Initialize OPAM (user-level)
-      shell: |
-        opam init --yes --shell-setup --bare
-      register: opam_init_output
-      changed_when: "'Opam was already initialised.' not in opam_init_output.stdout"
-
-    - name: Set OPAM environment for user
-      lineinfile:
-        path: "{{ lookup('env', 'HOME') }}/.bashrc"
-        line: "eval $(opam env)"
+  shell: |
+    opam init --yes --shell-setup --bare
+  register: opam_init_output
+  changed_when: "'Opam was already initialised.' not in opam_init_output.stdout and 'is already up-to-date' not in opam_init_output.stdout"

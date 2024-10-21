@@ -1,6 +1,6 @@
 ---
 - name: Install and configure opam
-  block:  
+  block:
     - name: Install opam if not already installed or if force update is true
       include_tasks: install_opam.yml
 
@@ -9,6 +9,3 @@
 
     - name: Install opam switches
       include_tasks: install_switches.yml
-  environment:
-    http_proxy: "{{ http_proxy }}"
-    https_proxy: "{{ https_proxy }}"

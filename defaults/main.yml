@@ -8,20 +8,27 @@ https_proxy: ""
 # Installation method: 'package_manager' or 'direct' (using opam.ocaml.org/install.sh)
 opam_install_method: direct
 
-# If a package manager is used, the package name
-opam_package_name: opam
+# If a direct installation is used, the version number of the opam executable
+opam_install_options_cli_options: ""
+### eg if you want a specific version of opam :
+# opam_install_options: "--version 2.0.1"
+### or the dev version :
+# opam_install_options: "--dev"
 opam_external_dependencies:
   - patch
   # the one I know may not be installed by default on some systems
 
-# Force update opam (useful for direct installation)
+# Force update the opam executable with direct installation
 opam_force_update: false
+
+# If a package manager is used, the package name
+opam_package_name: opam
 
 # Installation location: 'system_wide' or 'user'
 opam_install_location: system_wide
 
 opam_root_system_wide: /opt/opam
-opam_root_user: $HOME/.opam
+opam_root_user: "{{ ansible_env.HOME + '/.opam' }}"
 
 opam_switches:
   - name: "default"
