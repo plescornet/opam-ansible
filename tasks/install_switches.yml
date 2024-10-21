@@ -1,4 +1,14 @@
 ---
+### Should be useless thanks to the --confirm-level=unsafe-yes option in the opam install commands
+# - name: Install packages external dependencies
+#   ansible.builtin.package:
+#     name: "{{ item }}"
+#     state: present
+#   loop: "{{ opam_external_dependencies }}"
+#   environment:
+#     http_proxy: "{{ http_proxy }}"
+#     https_proxy: "{{ https_proxy }}"
+
 - name: Install OPAM switches
   become: "{{ opam_install_location == 'system_wide' }}"
   environment:
@@ -15,8 +25,10 @@
       loop: "{{ opam_switches }}"
 
     - name: Install packages for switch "{{ item.name }}"
-      ansible.builtin.command:
-        cmd: opam install --yes --switch={{ item.name }} {{ item.packages | join(' ') }}
+      ansible.builtin.command: opam install --confirm-level=unsafe-yes --color=never --switch={{ item.name }} {{ item.packages | join(' ') }}
+      environment:
+        OPAMROOT: "{{ (opam_install_location == 'system_wide') | ternary(opam_root_system_wide, opam_root_user) }}"
+        OPAMROOTISOK: "true"
       register: opam_install_output
       loop: "{{ opam_switches }}"
       when: item.packages | length > 0

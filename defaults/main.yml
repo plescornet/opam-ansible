@@ -1,11 +1,9 @@
 ---
-
 # set the default values for the role
 
 # Proxy settings
 http_proxy: ""
 https_proxy: ""
-
 
 # Installation method: 'package_manager' or 'direct' (using opam.ocaml.org/install.sh)
 opam_install_method: direct
@@ -42,3 +40,7 @@ opam_switches:
       - utop
       - ocamlformat
       - user-setup
+### should not be useful anymore thanks to the --confirm-level=unsafe-yes option in the opam install commands
+# opam_external_dependencies:
+#   - emacs-nw
+#   - jupyterlab
