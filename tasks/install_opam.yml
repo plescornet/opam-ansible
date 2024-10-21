@@ -5,9 +5,6 @@
   package:
     name: "{{ opam_package_name }}"
     state: present
-  environment:
-    http_proxy: "{{ http_proxy }}"
-    https_proxy: "{{ https_proxy }}"
 
 - name: Install opam directly
   when: opam_install_method == 'direct'
@@ -21,6 +18,3 @@
       responses:
         Where should it be installed ?: ""
       timeout: 120
-  environment:
-    http_proxy: "{{ http_proxy }}"
-    https_proxy: "{{ https_proxy }}"

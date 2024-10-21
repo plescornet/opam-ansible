@@ -1,19 +1,14 @@
 ---
 - name: Install and configure opam
-  block:
-    - name: Check if opam is already installed
-      command: opam --version
-      register: opam_installed
-      ignore_errors: true
-      changed_when: opam_installed.rc != 0
-      failed_when: false
-      
+  block:  
     - name: Install opam if not already installed or if force update is true
       include_tasks: install_opam.yml
-      when: opam_installed.changed or opam_force_update
 
     - name: Configure opam
       include_tasks: configure_opam.yml
 
     - name: Install opam switches
       include_tasks: install_switches.yml
+  environment:
+    http_proxy: "{{ http_proxy }}"
+    https_proxy: "{{ https_proxy }}"
