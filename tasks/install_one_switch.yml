@@ -30,7 +30,7 @@
       ansible.builtin.package:
         name: "{{ required_packages }}"
         state: present
-      when: required_packages | length > 0
+      changed_when: required_packages | length > 0
 
     - name: switch "{{ item.name }}" - install packages
       ansible.builtin.command:
