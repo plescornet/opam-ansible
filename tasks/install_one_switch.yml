@@ -23,7 +23,7 @@
     
     - name: switch "{{ item.name }}" - extract external dependencies
       set_fact:
-        required_packages: "{{ opam_install_depext_output.stdout_lines | select('match', '^    ') | map('regex_replace', '^    ', '') | list }}"
+        required_packages: "{{ opam_install_depext_output.stdout_lines | select('match', '^    ') | map('regex_replace', '^    ', '') | map('split', ' ') | flatten }}"
 
     - name: switch "{{ item.name }}" - install packages external dependencies
       become: true

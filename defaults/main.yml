@@ -17,6 +17,8 @@ opam_install_options_cli_options: ""
 opam_external_dependencies:
   - patch
   - bubblewrap
+  - gcc
+  - make
   # the one I know may not be installed by default on some systems
 
 # Force update the opam executable with direct installation
