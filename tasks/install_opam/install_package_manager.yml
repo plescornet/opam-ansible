@@ -1,0 +1,6 @@
+- name: Install opam using package manager
+  when: opam_install_method == 'package_manager'
+  package:
+    name: "{{ opam_package_name }}"
+    state: present
+  timeout: 60

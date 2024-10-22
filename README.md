@@ -24,7 +24,7 @@ Role Variables
 
 Most important variables are:
 - `opam_install_method` : The method used to install opam. Can be `package_manager` (using, `apt`, `dnf` or your favorite distribution package manager) or `direct` (uses the install script from the opam website). Default is `direct`.
-- `opam_install_location` : either `system_wide` for a system-wide installation or `user` for a user installation. Default is `system_wide`. For a user installation, it will install opam in the user's home directory `~/.opam`. For a system-wide installation, it will default to installing opam in `/opt/opam` (you can alter this with the `opam_root_system_wide` variable).
+- `opam_install_location` : either `system_wide` for a system-wide installation or `user` for a user installation. Default is `system_wide`. For a user installation, it will install opam in the user's home directory `~/.opam`. For a system-wide installation, it will default to installing opam in `/opt/opam` (you can alter this with the `opam_root_location_system_wide` variable).
 - `opam_switches` : a list of switches to create. For each switch, you must specify its name, the compiler version and the packages to install.
 
 Dependencies

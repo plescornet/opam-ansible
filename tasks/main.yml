@@ -2,11 +2,8 @@
 - name: Install and configure opam
   become: true
   block:
-    - name: Install opam if not already installed or if force update is true
-      include_tasks: install_opam.yml
+    - import_tasks: install_opam.yml
 
-    - name: Configure opam
-      include_tasks: configure_opam.yml
+    - import_tasks: configure_opam.yml
 
-    - name: Install opam switches
-      include_tasks: install_switches.yml
+    - import_tasks: install_switches.yml

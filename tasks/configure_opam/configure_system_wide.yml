@@ -1,0 +1,42 @@
+- name: Configure OPAM for system-wide installation
+  when: opam_install_location == 'system_wide'
+  block:
+    - name: Initialize OPAM (system-wide)
+      shell: |
+        opam init --root={{ opam_root_location_system_wide }} --bare -n
+      environment:
+        OPAMROOT: "{{ opam_root_location_system_wide }}"
+        OPAMROOTISOK: "true"
+      register: opam_init_output
+      changed_when: "'Opam was already initialised.' not in opam_init_output.stdout"
+
+    - name: Ensure OPAM environment variables are sourced in profile (system-wide)
+      copy:
+        dest: /etc/profile.d/opam.sh
+        content: |
+          export OPAMROOT={{ opam_root_location_system_wide }}
+          export OPAMROOTISOK=true
+          eval $(opam env --root={{ opam_root_location_system_wide }})
+          . {{ opam_root_location_system_wide }}/opam-init/init.sh > /dev/null 2> /dev/null || true
+        mode: "0644"
+
+    - name: Link OPAM environment script for X11 sessions
+      file:
+        src: /etc/profile.d/opam.sh
+        dest: /etc/X11/Xsession.d/99opam
+        state: link
+
+    # - name: Add block in /etc/bash.bashrc to source OPAM environment
+    #   ansible.builtin.blockinfile:
+    #     path: /etc/bash.bashrc
+    #     block: |
+    #       # OPAM configuration
+    #       if [ -f /etc/profile.d/opam.sh ]; then
+    #         . /etc/profile.d/opam.sh
+    #       fi
+
+    - name: Add OPAM environment to sudoers
+      copy:
+        dest: /etc/sudoers.d/opam
+        content: 'Defaults env_keep += "OPAMROOT OPAMROOTISOK"'
+        mode: "0440"

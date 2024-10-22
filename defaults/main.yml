@@ -16,6 +16,7 @@ opam_install_options_cli_options: ""
 # opam_install_options: "--dev"
 opam_external_dependencies:
   - patch
+  - bubblewrap
   # the one I know may not be installed by default on some systems
 
 # Force update the opam executable with direct installation
@@ -24,11 +25,17 @@ opam_force_update: false
 # If a package manager is used, the package name
 opam_package_name: opam
 
-# Installation location: 'system_wide' or 'user'
+# Installation location: 'system_wide' or 'user'.
 opam_install_location: system_wide
 
-opam_root_system_wide: /opt/opam
-opam_root_user: "{{ ansible_env.HOME + '/.opam' }}"
+# The specific folder can be set below, but the user initialization will be done in the user's home directory without sudo to avoid permission issues
+
+# In case of system-wide installation, the root location of the OPAM installation will only be writable by root/sudo
+opam_root_location_system_wide: /opt/opam
+
+# In case of user installation, the root location of the OPAM installation will be in the user's home directory and user-writable
+opam_root_location_user: "{{ ansible_env.HOME + '/.opam' }}"
+opam_user: "{{ ansible_user_id }}"
 
 opam_switches:
   - name: "default"
@@ -51,7 +58,7 @@ opam_switches:
       - ocamlformat
       - user-setup
 
-### should not be useful anymore thanks to the --confirm-level=unsafe-yes option in the opam install commands
+## should not be useful anymore thanks to the --confirm-level=unsafe-yes option in the opam install commands
 # opam_external_dependencies:
 #   - emacs-nw
 #   - jupyterlab
