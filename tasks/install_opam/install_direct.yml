@@ -2,6 +2,10 @@
   when: opam_install_method == 'direct'
   become: true
   block:
+    - name: Uninstall opam if it is already installed
+      ansible.builtin.package:
+        name: "{{ opam_package_name }}"
+        state: absent
     - name: Installing opam external dependencies
       ansible.builtin.package:
         name: "{{ item }}"
