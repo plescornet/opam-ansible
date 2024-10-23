@@ -5,6 +5,10 @@
 http_proxy: ""
 https_proxy: ""
 
+#########################
+### Opam installation ###
+#########################
+
 # Installation method: 'package_manager' or 'direct' (using opam.ocaml.org/install.sh)
 opam_install_method: direct
 
@@ -14,18 +18,24 @@ opam_install_options_cli_options: ""
 # opam_install_options: "--version 2.0.1"
 ### or the dev version :
 # opam_install_options: "--dev"
+
+# External dependencies required for the installation
 opam_external_dependencies:
   - patch
   - bubblewrap
   - gcc
   - make
-  # the one I know may not be installed by default on some systems
+  - unzip
 
 # Force update the opam executable with direct installation
 opam_force_update: false
 
 # If a package manager is used, the package name
 opam_package_name: opam
+
+##########################
+### Opam configuration ###
+##########################
 
 # Installation location: 'system_wide' or 'user'.
 opam_install_location: system_wide
@@ -39,6 +49,10 @@ opam_root_location_system_wide: /opt/opam
 opam_root_location_user: "{{ ansible_env.HOME + '/.opam' }}"
 opam_user: "{{ ansible_user_id }}"
 
+#####################
+### Opam packages ###
+#####################
+
 opam_switches:
   - name: "default"
     compiler: "4.14.2"
@@ -50,6 +64,9 @@ opam_switches:
       - ocamlformat
       - user-setup
       - jupyter
+      - qcheck
+      - alcotest
+      - qcheck-alcotest
   - name: "bleeding-edge"
     compiler: "5.2.0"
     packages:
@@ -59,8 +76,27 @@ opam_switches:
       - utop
       - ocamlformat
       - user-setup
+      - qcheck
+      - alcotest
+      - qcheck-alcotest
 
-## should not be useful anymore thanks to the --confirm-level=unsafe-yes option in the opam install commands
-# opam_external_dependencies:
-#   - emacs-nw
-#   - jupyterlab
+default_switch: "default"
+
+#########################
+### Post-installation ###
+#########################
+
+post_install_user: "{{ opam_user }}"
+
+# user_setup configuration
+configure_user_setup: true
+
+# Jupyter 
+configure_jupyter: true
+jupyter_switch: "default"
+
+# VSCode (TODO: still untested)
+configure_vscode: false
+vscode_executable_name: codium
+vscode_extensions:
+  - "ocamllabs.ocaml-platform"

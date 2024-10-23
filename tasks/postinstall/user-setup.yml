@@ -1,0 +1,7 @@
+- name: Execute opam user-setup install for user {{ post_install_user }}
+  when: configure_user_setup
+  become: true
+  ansible.builtin.command:
+    cmd: "su {{ post_install_user }} -c 'opam user-setup install'"
+  register: opam_user_setup
+  changed_when: "'updating' in opam_user_setup.stdout or 'adding' in opam_user_setup.stdout"

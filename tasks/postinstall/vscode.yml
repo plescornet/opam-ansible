@@ -1,0 +1,6 @@
+- name: Configure {{ vscode_executable_name }}
+  become_user: "{{ post_install_user }}"
+  ansible.builtin.command:
+    cmd: "{{ vscode_executable_name }} --install-extension {{ vscode_extensions | join(' --install-extension ') }}"
+  when: configure_vscode
+  changed_when: false

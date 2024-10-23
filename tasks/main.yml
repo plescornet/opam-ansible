@@ -2,8 +2,10 @@
 - name: Install and configure opam
   become: true
   block:
-    - import_tasks: install_opam.yml
+    - ansible.builtin.import_tasks: install_opam.yml
 
-    - import_tasks: configure_opam.yml
+    - ansible.builtin.import_tasks: configure_opam.yml
 
-    - import_tasks: install_switches.yml
+    - ansible.builtin.import_tasks: install_switches.yml
+      
+    - ansible.builtin.import_tasks: postinstall.yml
