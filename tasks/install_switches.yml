@@ -2,3 +2,9 @@
   include_tasks:
     file: install_one_switch.yml
   loop: "{{ opam_switches }}"
+
+- name: Configure the default switch as "{{ default_switch}}"
+  become: true
+  ansible.builtin.command:
+    cmd: "opam switch --root={{ (opam_install_location == 'system_wide') | ternary(opam_root_location_system_wide, opam_root_location_user) }} {{ default_switch }}"
+  changed_when: False

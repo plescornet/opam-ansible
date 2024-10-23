@@ -1,9 +1,10 @@
 - name: Install OPAM switch "{{ item.name }}"
+  become: "{{ opam_install_location == 'system_wide' }}"
   environment:
     OPAMROOT: "{{ (opam_install_location == 'system_wide') | ternary(opam_root_location_system_wide, opam_root_location_user) }}"
     OPAMROOTISOK: "true"
   block:
-    - name: switch "{{ item.name }}" - create switch
+    - name: create switch - switch "{{ item.name }}"
       become: true
       become_user: "{{ (opam_install_location == 'system_wide') | ternary('root', opam_user) }}"
       ansible.builtin.command:
@@ -14,25 +15,30 @@
         - opam_switch_create_output.rc != 0
         - "'[ERROR] There already is an installed switch named' not in opam_switch_create_output.stderr"
 
-    - name: switch "{{ item.name }}" - get external dependencies
+    - name: get external dependencies - switch "{{ item.name }}"
       become_user: "{{ (opam_install_location == 'system_wide') | ternary('root', opam_user) }}"
       ansible.builtin.command:
         cmd: opam install --confirm-level=unsafe-yes --color=never --switch={{ item.name }} --depext-only --dry-run {{ item.packages | join(' ') }}
       register: opam_install_depext_output
       changed_when: false
     
-    - name: switch "{{ item.name }}" - extract external dependencies
+    - name: extract external dependencies - switch "{{ item.name }}"
       set_fact:
-        required_packages: "{{ opam_install_depext_output.stdout_lines | select('match', '^    ') | map('regex_replace', '^    ', '') | map('split', ' ') | flatten }}"
+        required_packages: >-
+          {{ opam_install_depext_output.stdout_lines
+            | select('match', '^    ')
+            | map('regex_replace', '^    ', '')
+            | map('split', ' ')
+            | flatten }}
 
-    - name: switch "{{ item.name }}" - install packages external dependencies
+    - name: install packages external dependencies - switch "{{ item.name }}"
       become: true
       ansible.builtin.package:
         name: "{{ required_packages }}"
         state: present
       changed_when: required_packages | length > 0
 
-    - name: switch "{{ item.name }}" - install packages
+    - name: install packages - switch "{{ item.name }}"
       ansible.builtin.command:
         cmd: opam install --confirm-level=unsafe-yes --color=never --switch={{ item.name }} {{ item.packages | join(' ') }}
       become: true
