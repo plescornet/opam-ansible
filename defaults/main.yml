@@ -91,12 +91,12 @@ post_install_user: "{{ opam_user }}"
 # user_setup configuration
 configure_user_setup: true
 
-# Jupyter 
+# Jupyter
 configure_jupyter: true
 jupyter_switch: "default"
 
-# VSCode (TODO: still untested)
-configure_vscode: false
+# VSCode
+configure_vscode: true
 vscode_executable_name: codium
 vscode_extensions:
   - "ocamllabs.ocaml-platform"
