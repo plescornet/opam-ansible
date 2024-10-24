@@ -60,7 +60,7 @@ Example Playbook
 License
 -------
 
-?
+CC-BY-4.0
 
 Author Information
 ------------------
