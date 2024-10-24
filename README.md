@@ -36,12 +36,13 @@ Example Playbook
 ----------------
 
 ```yaml
-- hosts: all
+- hosts: localhost
   roles:
     - role: opam
       vars:
         opam_install_method: package_manager
         opam_install_location: user
+        opam_root_location_user: "/home/{{ ansible_user_id }}/.opam"
         opam_switches:
           - name: "default"
             compiler: "4.14.2"
