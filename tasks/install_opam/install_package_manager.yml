@@ -1,7 +1,7 @@
 - name: Install opam using package manager
   become: true
   when: opam_install_method == 'package_manager'
-  package:
+  ansible.builtin.package:
     name: "{{ opam_package_name }}"
     state: present
   timeout: 60

@@ -1,7 +1,1 @@
 - name: Execute specified post_install scripts
-  block:
-    - ansible.builtin.import_tasks: postinstall/user-setup.yml
-      
-    - ansible.builtin.import_tasks: postinstall/jupyter.yml
-      
-    - ansible.builtin.import_tasks: postinstall/vscode.yml

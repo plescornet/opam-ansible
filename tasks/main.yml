@@ -2,10 +2,19 @@
 - name: Install and configure opam
   become: true
   block:
-    - ansible.builtin.import_tasks: install_opam.yml
+    - name: Install Opam executable {{ opam_install_method }}
+      ansible.builtin.import_tasks: install_opam/install_{{ opam_install_method }}.yml
 
-    - ansible.builtin.import_tasks: configure_opam.yml
+    - name: Configure Opam {{ opam_install_location }}
+      ansible.builtin.import_tasks: configure_opam/configure_{{ opam_install_location }}.yml
 
-    - ansible.builtin.import_tasks: install_switches.yml
-      
-    - ansible.builtin.import_tasks: postinstall.yml
+    - name: Install Opam switches
+      ansible.builtin.import_tasks: install_switches.yml
+
+    - name: Execute postinstall configurations
+      block:
+        - ansible.builtin.import_tasks: postinstall/user-setup.yml
+
+        - ansible.builtin.import_tasks: postinstall/jupyter.yml
+
+        - ansible.builtin.import_tasks: postinstall/vscode.yml

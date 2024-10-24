@@ -5,18 +5,18 @@
     OPAMROOT: "{{ (opam_install_location == 'system_wide') | ternary(opam_root_location_system_wide, opam_root_location_user) }}"
     OPAMROOTISOK: "true"
   block:
-    - name: activate the opam environment
+    - name: Activate the opam environment
       ansible.builtin.command: opam switch {{ jupyter_switch }}
       changed_when: false
-    - name: extract the switch folder
+    - name: Extract the switch folder
       ansible.builtin.command: opam var prefix
       register: opam_switch_prefix
       changed_when: false
-    - name: generate the ocaml kernel
+    - name: Generate the ocaml kernel
       ansible.builtin.command: "{{ opam_switch_prefix.stdout }}/bin/ocaml-jupyter-opam-genspec"
       register: ocaml_kernel
       changed_when: false
-    - name: install the ocaml kernel
+    - name: Install the ocaml kernel
       become: true
       ansible.builtin.command: "jupyter kernelspec install --name ocaml-jupyter-{{ jupyter_switch }} {{ opam_switch_prefix.stdout }}/share/jupyter"
       changed_when: false

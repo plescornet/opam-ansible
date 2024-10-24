@@ -12,7 +12,7 @@
         state: present
       loop: "{{ opam_external_dependencies }}"
     - name: Install Opam using direct install script
-      expect:
+      ansible.builtin.expect:
         command: bash -c "sh <(curl -fsSL https://opam.ocaml.org/install.sh {{ opam_install_options_cli_options }})"
         responses:
           Where should it be installed ?: ""

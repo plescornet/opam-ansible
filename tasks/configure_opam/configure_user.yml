@@ -1,8 +1,8 @@
 - name: Initialize OPAM for user-level installation
   when: opam_install_location == 'user'
-  become: yes
+  become: true
   become_user: "{{ opam_user }}"
-  shell: |
+  ansible.builtin.shell: |
     opam init --yes --shell-setup --bare
   register: opam_init_output
   changed_when: "'Opam was already initialised.' not in opam_init_output.stdout and 'is already up-to-date' not in opam_init_output.stdout"

@@ -1,2 +1,0 @@
----
-- ansible.builtin.import_tasks: configure_opam/configure_{{ opam_install_location }}.yml

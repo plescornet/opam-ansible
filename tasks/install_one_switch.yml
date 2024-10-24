@@ -4,7 +4,7 @@
     OPAMROOT: "{{ (opam_install_location == 'system_wide') | ternary(opam_root_location_system_wide, opam_root_location_user) }}"
     OPAMROOTISOK: "true"
   block:
-    - name: create switch - switch "{{ item.name }}"
+    - name: Create switch - switch "{{ item.name }}"
       become: true
       become_user: "{{ (opam_install_location == 'system_wide') | ternary('root', opam_user) }}"
       ansible.builtin.command:
@@ -15,15 +15,15 @@
         - opam_switch_create_output.rc != 0
         - "'[ERROR] There already is an installed switch named' not in opam_switch_create_output.stderr"
 
-    - name: get external dependencies - switch "{{ item.name }}"
+    - name: Get external dependencies - switch "{{ item.name }}"
       become_user: "{{ (opam_install_location == 'system_wide') | ternary('root', opam_user) }}"
       ansible.builtin.command:
         cmd: opam install --confirm-level=unsafe-yes --color=never --switch={{ item.name }} --depext-only --dry-run {{ item.packages | join(' ') }}
       register: opam_install_depext_output
       changed_when: false
-    
-    - name: extract external dependencies - switch "{{ item.name }}"
-      set_fact:
+
+    - name: Extract external dependencies - switch "{{ item.name }}"
+      ansible.builtin.set_fact:
         required_packages: >-
           {{ opam_install_depext_output.stdout_lines
             | select('match', '^    ')
@@ -31,14 +31,14 @@
             | map('split', ' ')
             | flatten }}
 
-    - name: install packages external dependencies - switch "{{ item.name }}"
+    - name: Install packages external dependencies - switch "{{ item.name }}"
       become: true
       ansible.builtin.package:
         name: "{{ required_packages }}"
         state: present
       changed_when: required_packages | length > 0
 
-    - name: install packages - switch "{{ item.name }}"
+    - name: Install packages - switch "{{ item.name }}"
       ansible.builtin.command:
         cmd: opam install --confirm-level=unsafe-yes --color=never --switch={{ item.name }} {{ item.packages | join(' ') }}
       become: true
