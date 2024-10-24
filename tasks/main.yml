@@ -3,10 +3,10 @@
   become: true
   block:
     - name: Install Opam executable {{ opam_install_method }}
-      ansible.builtin.import_tasks: install_opam/install_{{ opam_install_method }}.yml
+      ansible.builtin.include_tasks: install_opam/install_{{ opam_install_method }}.yml
 
     - name: Configure Opam {{ opam_install_location }}
-      ansible.builtin.import_tasks: configure_opam/configure_{{ opam_install_location }}.yml
+      ansible.builtin.include_tasks: configure_opam/configure_{{ opam_install_location }}.yml
 
     - name: Install Opam switches
       ansible.builtin.import_tasks: install_switches.yml

@@ -19,7 +19,7 @@ argument_specs:
           - "'direct' installs OPAM using the opam.ocaml.org install script."
           - "'package_manager' installs via a system's package manager."
 
-      opam_install_options_cli_options:
+      opam_install_cli_options:
         type: str
         required: false
         default: ""

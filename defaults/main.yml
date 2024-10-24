@@ -9,11 +9,11 @@
 opam_install_method: direct
 
 # If a direct installation is used, the version number of the opam executable
-opam_install_options_cli_options: ""
+opam_install_cli_options: ""
 ### eg if you want a specific version of opam :
-# opam_install_options: "--version 2.0.1"
+# opam_install_cli_options: "--version 2.0.1"
 ### or the dev version :
-# opam_install_options: "--dev"
+# opam_install_cli_options: "--dev"
 
 # External dependencies required for the installation
 opam_external_dependencies:
@@ -54,28 +54,6 @@ opam_switches:
     compiler: "4.14.2"
     packages:
       - dune
-      - tuareg
-      - ocaml-lsp-server
-      - utop
-      - ocamlformat
-      - user-setup
-      - jupyter
-      - qcheck
-      - alcotest
-      - qcheck-alcotest
-  - name: "bleeding-edge"
-    compiler: "5.2.0"
-    packages:
-      - dune
-      - tuareg
-      - ocaml-lsp-server
-      - utop
-      - ocamlformat
-      - user-setup
-      - qcheck
-      - alcotest
-      - qcheck-alcotest
-
 default_switch: "default"
 
 #########################
@@ -85,14 +63,14 @@ default_switch: "default"
 post_install_user: "{{ opam_user }}"
 
 # user_setup configuration
-configure_user_setup: true
+configure_user_setup: false
 
 # Jupyter
-configure_jupyter: true
+configure_jupyter: false
 jupyter_switch: "default"
 
 # VSCode
-configure_vscode: true
+configure_vscode: false
 vscode_executable_name: codium
 vscode_extensions:
   - "ocamllabs.ocaml-platform"
