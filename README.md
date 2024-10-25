@@ -1,4 +1,4 @@
-opam
+opam-ansible
 =========
 
 Manages the installation, switch creation, and configuration of [opam](https://opam.ocaml.org/), the OCaml package manager.
@@ -9,6 +9,7 @@ Requirements
 Executing this role **does not require opam installed**. The role will install opam for you.
 
 This role assumes you are using `bash`. If you want to use another shell, you should add the appropriate command to your shell configuration file if necessary. For example, you can add in your `.zshrc` file :
+
 ```bash
 eval $(opam env --root=/path/to/opam --set-root)
 # by default on a system-wide installation, the root is /opt/opam :
@@ -23,6 +24,7 @@ Role Variables
 --------------
 
 Most important variables are:
+
 - `opam_install_method` : The method used to install opam. Can be `package_manager` (using, `apt`, `dnf` or your favorite distribution package manager) or `direct` (uses the install script from the opam website). Default is `direct`.
 - `opam_install_location` : either `system_wide` for a system-wide installation or `user` for a user installation. Default is `system_wide`. For a user installation, it will install opam in the user's home directory `~/.opam`. For a system-wide installation, it will default to installing opam in `/opt/opam` (you can alter this with the `opam_root_location_system_wide` variable).
 - `opam_switches` : a list of switches to create. For each switch, you must specify its name, the compiler version and the packages to install.
@@ -38,7 +40,7 @@ Example Playbook
 ```yaml
 - hosts: localhost
   roles:
-    - role: opam
+    - role: opam-ansible
       vars:
         opam_install_method: package_manager
         opam_install_location: user
