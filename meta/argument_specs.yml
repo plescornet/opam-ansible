@@ -1,19 +1,19 @@
 ---
 argument_specs:
   main:
-    short_description: Main entry point for the opam role
+    short_description: "Main entrypoint for the OPAM role."
     description:
-      - This is the main entrypoint for the C(opam) role, responsible for installing,
+      - This is the main entrypoint for the opam role, responsible for installing,
         configuring, and managing OCaml packages through OPAM.
     author:
       - Pierre Le Scornet
     options:
       opam_install_method:
         type: str
+        required: true
         choices:
           - direct
           - package_manager
-        default: direct
         description:
           - "Defines the method of installing OPAM."
           - "'direct' installs OPAM using the opam.ocaml.org install script."
@@ -21,7 +21,6 @@ argument_specs:
 
       opam_install_cli_options:
         type: str
-        required: false
         default: ""
         description:
           - "CLI options for direct installation, such as specifying the OPAM version."
@@ -29,7 +28,6 @@ argument_specs:
       opam_external_dependencies:
         type: list
         elements: str
-        required: false
         default:
           - patch
           - bubblewrap
@@ -51,10 +49,10 @@ argument_specs:
 
       opam_install_location:
         type: str
+        required: true
         choices:
           - system_wide
           - user
-        default: system_wide
         description:
           - "Defines the installation scope of OPAM."
           - "'system_wide' installs OPAM globally, requiring sudo."
@@ -78,10 +76,10 @@ argument_specs:
       opam_switches:
         type: list
         elements: dict
-        required: false
         description:
           - "List of OPAM switches to create."
           - "Each switch contains a name, OCaml compiler version, and packages to install."
+        default: []
         options:
           name:
             type: str
@@ -99,7 +97,7 @@ argument_specs:
 
       default_switch:
         type: str
-        default: "default"
+        default: ""
         description: "The OPAM switch to set as default after installation."
 
       post_install_user:
@@ -109,12 +107,12 @@ argument_specs:
 
       configure_user_setup:
         type: bool
-        default: true
+        default: false
         description: "Flag to configure OPAM user-setup after installation."
 
       configure_jupyter:
         type: bool
-        default: true
+        default: false
         description: "Flag to configure Jupyter support in OPAM."
 
       jupyter_switch:
@@ -124,12 +122,12 @@ argument_specs:
 
       configure_vscode:
         type: bool
-        default: true
+        default: false
         description: "Flag to configure VSCode with OCaml tooling."
 
       vscode_executable_name:
         type: str
-        default: codium
+        default: code
         description: "The executable name for VSCode or its alternatives like VSCodium."
 
       vscode_extensions:
