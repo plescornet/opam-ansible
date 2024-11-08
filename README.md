@@ -10,7 +10,7 @@ Executing this role **does not require opam installed**. The role will install o
 
 If you want to install opam through the system package manager, you need to know the opam package manager name for your system (default is `opam`). You can find it [here](https://opam.ocaml.org/doc/Install.html). If you want a direct installation from the official opam install script, you may need to change the `opam_external_dependencies` variable to list the dependencies needed to run the script, or run it yourself before running the role.
 
-If you specify an opam package with external dependencies, they are installed through the system package manager during the `opam install` command (using `--confirm-level=unsafe-yes`).
+If you specify an opam package with external dependencies, they are installed through the system package manager.
 
 Role Variables
 --------------
@@ -38,7 +38,7 @@ You probably also want to set the following variables :
         - ocaml-lsp-server
         - qcheck
   ```
-- `default_switch` : the name of the switch to set as the default. Default is `""`. If you don't set it, no switch will be set as the default (and the "global" switch will be the last one created).
+- `default_switch` : the name of the switch to set as the default. Default is `""`. If you don't set it, the ansible script will leave it .
 - `configure_vscode`, `configure_jupyter` and `configure_user_setup` are boolean variables that will configure the corresponding tools for the user. Default is `false` (no postinstall configuration, except eventually configuring the default switch).
 
 Dependencies
