@@ -94,6 +94,15 @@ argument_specs:
             elements: str
             required: true
             description: "List of packages to install in the switch."
+          allow_invariant_updates:
+            type: bool
+            default: false
+            description: "Flag to allow invariant updates during package upgrades (global default : false, should be set for each switch)."
+      
+      global_allow_invariant_updates:
+        type: bool
+        default: false
+        description: "Global flag to allow invariant updates during package upgrades."
 
       default_switch:
         type: str

@@ -16,6 +16,7 @@
         - "'[ERROR] There already is an installed switch named' not in opam_switch_create_output.stderr"
 
     - name: Get external dependencies - switch "{{ item.name }}"
+      become: true
       become_user: "{{ (opam_install_location == 'system_wide') | ternary('root', opam_user) }}"
       ansible.builtin.command:
         cmd: opam install --confirm-level=unsafe-yes --color=never --switch={{ item.name }} --depext-only --dry-run {{ item.packages | join(' ') }}
@@ -47,3 +48,16 @@
       when: item.packages | length > 0
       changed_when: "'Done.' in opam_install_output.stdout"
       failed_when: opam_install_output.rc != 0
+
+    - name: Upgrade packages - switch "{{ item.name }}"
+      ansible.builtin.command:
+        # if allow_invariant_updates is true, then we can use --update-invariant
+        cmd: >
+          opam upgrade --confirm-level=unsafe-yes --color=never --switch={{ item.name }}
+          {{ item.allow_invariant_updates | default(global_allow_invariant_updates) | ternary('--update-invariant', '') }}
+      become: true
+      become_user: "{{ (opam_install_location == 'system_wide') | ternary('root', opam_user) }}"
+      register: opam_upgrade_output
+      changed_when: "'Done.' in opam_upgrade_output.stdout"
+      failed_when: opam_upgrade_output.rc != 0
+      when: item.packages | length > 0

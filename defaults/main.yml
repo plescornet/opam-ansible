@@ -51,6 +51,7 @@ opam_user: "{{ ansible_user_id }}"
 
 opam_switches: []
 default_switch: ""
+global_allow_invariant_updates: false
 
 #########################
 ### Post-installation ###
