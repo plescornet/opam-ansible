@@ -1,6 +1,6 @@
 - name: Update OPAM cache
   ansible.builtin.command:
-    cmd: opam update
+    cmd: opam update -y
   become: true
   become_user: "{{ (opam_install_location == 'system_wide') | ternary('root', opam_user) }}"
   register: opam_update_output
