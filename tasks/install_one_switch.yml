@@ -60,4 +60,4 @@
       register: opam_upgrade_output
       changed_when: "'Done.' in opam_upgrade_output.stdout"
       failed_when: opam_upgrade_output.rc != 0
-      when: item.packages | length > 0
+      when: opam_update_output is changed
