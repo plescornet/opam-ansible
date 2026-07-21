@@ -47,6 +47,7 @@
         url: "{{ opam_direct_url }}"
         dest: "{{ opam_direct_destination }}"
         checksum: "{{ opam_direct_checksum }}"
+        force: true
         owner: root
         group: root
         mode: "0755"

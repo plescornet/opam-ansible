@@ -25,7 +25,7 @@ The required variables are :
 
 You probably also want to set the following variables :
 
-- `opam_switches` : a list of switch to create and configure, each one should have a `name`, a `compiler` and a list of `packages` to install. The compiler should be a version string (e.g. "4.14.2") or `latest` for the newest compiler available from OPAM's configured repositories. The packages should be a list of strings with the package name. The default is an empty list (no switch created). For example :
+- `opam_switches` : a list of switch to create and configure, each one should have a `name`, a `compiler` and a list of `packages` to install. The compiler should be a version string (e.g. "4.14.2") or `latest` for the newest compiler available from OPAM's configured repositories. `latest` is resolved only when creating a new switch and does not recreate existing switches. For an explicit compiler version mismatch, `compiler_mismatch` defaults to `fail`; set it to `skip` to retain the switch or `recreate` to remove and rebuild it. The packages should be a list of strings with the package name. The default is an empty list (no switch created). For example :
   ```yaml
   opam_switches:
     - name: "default"

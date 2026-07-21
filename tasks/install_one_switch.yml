@@ -4,6 +4,65 @@
     OPAMROOT: "{{ (opam_install_location == 'system_wide') | ternary(opam_root_location_system_wide, opam_root_location_user) }}"
     OPAMROOTISOK: "true"
   block:
+    - name: List installed switches
+      ansible.builtin.command:
+        cmd: opam switch list --short
+      become: true
+      become_user: "{{ (opam_install_location == 'system_wide') | ternary('root', opam_user) }}"
+      register: opam_switch_list
+      changed_when: false
+
+    - name: Determine whether switch exists - switch "{{ item.name }}"
+      ansible.builtin.set_fact:
+        opam_switch_exists: "{{ item.name in opam_switch_list.stdout_lines }}"
+
+    - name: Get installed compiler version - switch "{{ item.name }}"
+      ansible.builtin.command:
+        cmd: >-
+          opam list --switch={{ item.name }} --installed --invariant
+          --short --columns=version
+      become: true
+      become_user: "{{ (opam_install_location == 'system_wide') | ternary('root', opam_user) }}"
+      register: opam_switch_compiler
+      changed_when: false
+      when:
+        - opam_switch_exists
+        - item.compiler != 'latest'
+
+    - name: Validate compiler mismatch policy - switch "{{ item.name }}"
+      ansible.builtin.assert:
+        that:
+          - item.compiler_mismatch | default('fail') in ['fail', 'skip', 'recreate']
+        fail_msg: >-
+          compiler_mismatch for switch {{ item.name }} must be fail, skip, or recreate.
+      when:
+        - opam_switch_exists
+        - item.compiler != 'latest'
+        - opam_switch_compiler.stdout != item.compiler
+
+    - name: Fail for compiler mismatch - switch "{{ item.name }}"
+      ansible.builtin.fail:
+        msg: >-
+          Switch {{ item.name }} uses OCaml {{ opam_switch_compiler.stdout }}, but the
+          playbook requests {{ item.compiler }}. Set compiler_mismatch to skip to retain
+          the switch or recreate to remove and rebuild it.
+      when:
+        - opam_switch_exists
+        - item.compiler != 'latest'
+        - opam_switch_compiler.stdout != item.compiler
+        - item.compiler_mismatch | default('fail') == 'fail'
+
+    - name: Remove switch with a different compiler - switch "{{ item.name }}"
+      ansible.builtin.command:
+        cmd: opam switch remove --yes {{ item.name }}
+      become: true
+      become_user: "{{ (opam_install_location == 'system_wide') | ternary('root', opam_user) }}"
+      when:
+        - opam_switch_exists
+        - item.compiler != 'latest'
+        - item.compiler_mismatch | default('fail') == 'recreate'
+        - opam_switch_compiler.stdout != item.compiler
+
     - name: Create switch - switch "{{ item.name }}"
       become: true
       become_user: "{{ (opam_install_location == 'system_wide') | ternary('root', opam_user) }}"
@@ -11,11 +70,13 @@
         cmd: >-
           opam switch create {{ item.name }}
           {{ (item.compiler == 'latest') | ternary('ocaml-base-compiler', item.compiler) }} --yes
-      register: opam_switch_create_output
-      changed_when: "'[ERROR] There already is an installed switch named' not in opam_switch_create_output.stderr"
-      failed_when:
-        - opam_switch_create_output.rc != 0
-        - "'[ERROR] There already is an installed switch named' not in opam_switch_create_output.stderr"
+      when: >-
+        not opam_switch_exists or
+        (
+          item.compiler != 'latest' and
+          item.compiler_mismatch | default('fail') == 'recreate' and
+          opam_switch_compiler.stdout != item.compiler
+        )
 
     - name: Get external dependencies - switch "{{ item.name }}"
       become: true

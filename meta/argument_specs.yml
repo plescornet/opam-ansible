@@ -99,7 +99,15 @@ argument_specs:
           compiler:
             type: str
             required: true
-            description: "OCaml compiler version to be used in the switch, or latest for the newest available OCaml compiler."
+            description: "OCaml compiler version to be used in the switch, or latest for a newly created switch's newest available OCaml compiler."
+          compiler_mismatch:
+            type: str
+            choices:
+              - fail
+              - skip
+              - recreate
+            default: fail
+            description: "Action for an explicit compiler version mismatch: fail, skip, or recreate the switch."
           packages:
             type: list
             elements: str
