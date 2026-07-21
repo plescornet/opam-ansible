@@ -8,7 +8,9 @@ Requirements
 
 Executing this role **does not require opam installed**. The role will install opam for you.
 
-If you want to install opam through the system package manager, you need to know the opam package manager name for your system (default is `opam`). You can find it [here](https://opam.ocaml.org/doc/Install.html). If you want a direct installation from the official opam install script, you may need to change the `opam_external_dependencies` variable to list the dependencies needed to run the script, or run it yourself before running the role.
+If you want to install opam through the system package manager, you need to know the opam package manager name for your system (default is `opam`). You can find it [here](https://opam.ocaml.org/doc/Install.html).
+
+Direct installation supports Linux only and downloads a verified, pinned OPAM release binary. Set `opam_direct_url` to the exact binary URL and `opam_direct_checksum` to its SHA-256 in Ansible format (`sha256:<64-hex-character checksum>`). Find official release binaries at [OPAM releases](https://github.com/ocaml/opam/releases). Set `opam_replace_package_managed: true` only when the role should remove an existing package-manager OPAM installation.
 
 If you specify an opam package with external dependencies, they are installed through the system package manager.
 
@@ -17,8 +19,9 @@ Role Variables
 
 The required variables are :
 
-- `opam_install_method` : The method used to install opam. Can be `package_manager` (using, `apt`, `dnf` or your favorite distribution package manager) or `direct` (uses the install script from the opam website).
+- `opam_install_method` : The method used to install opam. Can be `package_manager` (using, `apt`, `dnf` or your favorite distribution package manager) or `direct` (downloads a verified, pinned Linux release binary).
 - `opam_install_location` : either `system_wide` for a system-wide installation or `user` for a user installation. Default is `system_wide`. For a user installation, it will install opam in the user's home directory `~/.opam`. For a system-wide installation, it will default to installing opam in `/opt/opam` (you can alter this with the `opam_root_location_system_wide` variable).
+- `opam_direct_url` and `opam_direct_checksum`: required when `opam_install_method: direct`. They identify and verify a pinned Linux OPAM release binary.
 
 You probably also want to set the following variables :
 

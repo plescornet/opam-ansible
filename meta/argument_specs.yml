@@ -16,14 +16,30 @@ argument_specs:
           - package_manager
         description:
           - "Defines the method of installing OPAM."
-          - "'direct' installs OPAM using the opam.ocaml.org install script."
+          - "'direct' installs a verified, pinned Linux OPAM release binary."
           - "'package_manager' installs via a system's package manager."
 
-      opam_install_cli_options:
+      opam_direct_url:
         type: str
         default: ""
         description:
-          - "CLI options for direct installation, such as specifying the OPAM version."
+          - "Pinned URL of the Linux OPAM release binary for direct installation."
+
+      opam_direct_checksum:
+        type: str
+        default: ""
+        description:
+          - "SHA-256 checksum for opam_direct_url, formatted as sha256:<checksum>."
+
+      opam_direct_destination:
+        type: path
+        default: /usr/local/bin/opam
+        description: "Destination for the direct-install OPAM binary."
+
+      opam_replace_package_managed:
+        type: bool
+        default: false
+        description: "Remove the package-manager OPAM package before direct installation."
 
       opam_external_dependencies:
         type: list
@@ -36,11 +52,6 @@ argument_specs:
           - unzip
         description:
           - "External system dependencies required for OPAM installation."
-
-      opam_force_update:
-        type: bool
-        default: false
-        description: "Force reinstallation of OPAM executable in direct installation."
 
       opam_package_name:
         type: str
