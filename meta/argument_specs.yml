@@ -99,7 +99,7 @@ argument_specs:
           compiler:
             type: str
             required: true
-            description: "OCaml compiler version to be used in the switch."
+            description: "OCaml compiler version to be used in the switch, or latest for the newest available OCaml compiler."
           packages:
             type: list
             elements: str

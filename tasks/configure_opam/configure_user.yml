@@ -2,7 +2,10 @@
   when: opam_install_location == 'user'
   become: true
   become_user: "{{ opam_user }}"
+  environment:
+    OPAMROOT: "{{ opam_root_location_user }}"
+    OPAMROOTISOK: "true"
   ansible.builtin.shell: |
-    opam init --yes --shell-setup --bare
+    opam init --root={{ opam_root_location_user }} --yes --shell-setup --bare
   register: opam_init_output
   changed_when: "'Opam was already initialised.' not in opam_init_output.stdout and 'is already up-to-date' not in opam_init_output.stdout"

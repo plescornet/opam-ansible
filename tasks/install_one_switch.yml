@@ -8,7 +8,9 @@
       become: true
       become_user: "{{ (opam_install_location == 'system_wide') | ternary('root', opam_user) }}"
       ansible.builtin.command:
-        cmd: opam switch create {{ item.name }} {{ item.compiler }} --yes
+        cmd: >-
+          opam switch create {{ item.name }}
+          {{ (item.compiler == 'latest') | ternary('ocaml-base-compiler', item.compiler) }} --yes
       register: opam_switch_create_output
       changed_when: "'[ERROR] There already is an installed switch named' not in opam_switch_create_output.stderr"
       failed_when:

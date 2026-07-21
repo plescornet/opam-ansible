@@ -20,7 +20,11 @@
 
     - name: Configure the default switch as "{{ default_switch }}"
       become: true
+      become_user: "{{ (opam_install_location == 'system_wide') | ternary('root', opam_user) }}"
+      environment:
+        OPAMROOT: "{{ (opam_install_location == 'system_wide') | ternary(opam_root_location_system_wide, opam_root_location_user) }}"
+        OPAMROOTISOK: "true"
       ansible.builtin.command:
-        cmd: "opam switch --root={{ (opam_install_location == 'system_wide') | ternary(opam_root_location_system_wide, opam_root_location_user) }} {{ default_switch }}"
+        cmd: "opam switch {{ default_switch }}"
       changed_when: false
       when: default_switch != ""
