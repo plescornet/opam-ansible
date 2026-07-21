@@ -15,26 +15,11 @@
           then set opam_direct_url and opam_direct_checksum
           (sha256:<64-hex-character checksum>).
 
-    - name: Gather installed package facts
-      ansible.builtin.package_facts:
-        manager: auto
-
-    - name: Require explicit replacement of package-manager OPAM
-      ansible.builtin.assert:
-        that:
-          - opam_package_name not in ansible_facts.packages or opam_replace_package_managed
-        fail_msg: >-
-          {{ opam_package_name }} is already installed by the system package manager.
-          Set opam_replace_package_managed to true to remove it before the direct
-          installation, or use opam_install_method: package_manager.
-
     - name: Remove package-manager OPAM when explicitly requested
       ansible.builtin.package:
         name: "{{ opam_package_name }}"
         state: absent
-      when:
-        - opam_replace_package_managed
-        - opam_package_name in ansible_facts.packages
+      when: opam_replace_package_managed
 
     - name: Install OPAM external dependencies
       ansible.builtin.package:
