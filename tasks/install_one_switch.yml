@@ -98,15 +98,37 @@
         - item.packages | length > 0
         - opam_external_dependencies.stdout_lines | length > 0
 
-    - name: Install packages - switch "{{ item.name }}"
+    - name: Check packages - switch "{{ item.name }}"
+      ansible.builtin.command:
+        cmd: opam install --switch={{ item.name }} --check {{ item.packages | join(' ') }}
+      become: true
+      become_user: "{{ (opam_install_location == 'system_wide') | ternary('root', opam_user) }}"
+      register: opam_install_check
+      changed_when: false
+      failed_when: opam_install_check.rc not in [0, 1]
+      when: item.packages | length > 0
+
+    - name: Install missing packages - switch "{{ item.name }}"
       ansible.builtin.command:
         cmd: opam install --confirm-level=unsafe-yes --color=never --switch={{ item.name }} {{ item.packages | join(' ') }}
       become: true
       become_user: "{{ (opam_install_location == 'system_wide') | ternary('root', opam_user) }}"
-      register: opam_install_output
-      when: item.packages | length > 0
-      changed_when: "'Done.' in opam_install_output.stdout"
-      failed_when: opam_install_output.rc != 0
+      changed_when: true
+      when:
+        - item.packages | length > 0
+        - opam_install_check.rc == 1
+
+    - name: Check package upgrades - switch "{{ item.name }}"
+      ansible.builtin.command:
+        cmd: >-
+          opam upgrade --switch={{ item.name }} --check
+          {{ item.allow_invariant_updates | default(global_allow_invariant_updates) | ternary('--update-invariant', '') }}
+      become: true
+      become_user: "{{ (opam_install_location == 'system_wide') | ternary('root', opam_user) }}"
+      register: opam_upgrade_check
+      changed_when: false
+      failed_when: opam_upgrade_check.rc not in [0, 1]
+      when: opam_update_output is changed
 
     - name: Upgrade packages - switch "{{ item.name }}"
       ansible.builtin.command:
@@ -116,7 +138,7 @@
           {{ item.allow_invariant_updates | default(global_allow_invariant_updates) | ternary('--update-invariant', '') }}
       become: true
       become_user: "{{ (opam_install_location == 'system_wide') | ternary('root', opam_user) }}"
-      register: opam_upgrade_output
-      changed_when: "'Done.' in opam_upgrade_output.stdout"
-      failed_when: opam_upgrade_output.rc != 0
-      when: opam_update_output is changed
+      changed_when: true
+      when:
+        - opam_update_output is changed
+        - opam_upgrade_check.rc == 0

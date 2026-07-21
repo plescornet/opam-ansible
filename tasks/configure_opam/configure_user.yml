@@ -1,11 +1,19 @@
-- name: Initialize OPAM for user-level installation
+- name: Check whether user OPAM root is initialized
   when: opam_install_location == 'user'
+  become: true
+  become_user: "{{ opam_user }}"
+  ansible.builtin.stat:
+    path: "{{ opam_root_location_user }}/config"
+  register: opam_user_root_config
+
+- name: Initialize OPAM for user-level installation
+  when:
+    - opam_install_location == 'user'
+    - not opam_user_root_config.stat.exists
   become: true
   become_user: "{{ opam_user }}"
   environment:
     OPAMROOT: "{{ opam_root_location_user }}"
     OPAMROOTISOK: "true"
-  ansible.builtin.shell: |
-    opam init --root={{ opam_root_location_user }} --yes --shell-setup --bare
-  register: opam_init_output
-  changed_when: "'Opam was already initialised.' not in opam_init_output.stdout and 'is already up-to-date' not in opam_init_output.stdout"
+  ansible.builtin.command:
+    cmd: opam init --root={{ opam_root_location_user }} --yes --shell-setup --bare

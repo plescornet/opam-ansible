@@ -2,14 +2,18 @@
   when: opam_install_location == 'system_wide'
   become: true
   block:
+    - name: Check whether system-wide OPAM root is initialized
+      ansible.builtin.stat:
+        path: "{{ opam_root_location_system_wide }}/config"
+      register: opam_system_root_config
+
     - name: Initialize OPAM (system-wide)
-      ansible.builtin.shell: |
-        opam init --root={{ opam_root_location_system_wide }} --bare -n
+      ansible.builtin.command:
+        cmd: opam init --root={{ opam_root_location_system_wide }} --bare -n
       environment:
         OPAMROOT: "{{ opam_root_location_system_wide }}"
         OPAMROOTISOK: "true"
-      register: opam_init_output
-      changed_when: "'Opam was already initialised.' not in opam_init_output.stdout"
+      when: not opam_system_root_config.stat.exists
 
     - name: Ensure OPAM environment variables are sourced in profile (system-wide)
       ansible.builtin.copy:

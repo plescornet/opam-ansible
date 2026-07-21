@@ -1,14 +1,14 @@
 - name: Update OPAM cache
   ansible.builtin.command:
-    cmd: opam update -y
+    cmd: opam update --check -y
   become: true
   become_user: "{{ (opam_install_location == 'system_wide') | ternary('root', opam_user) }}"
   environment:
     OPAMROOT: "{{ (opam_install_location == 'system_wide') | ternary(opam_root_location_system_wide, opam_root_location_user) }}"
     OPAMROOTISOK: "true"
   register: opam_update_output
-  changed_when: "'no changes from' not in opam_update_output.stdout"
-  failed_when: opam_update_output.rc != 0
+  changed_when: opam_update_output.rc == 0
+  failed_when: opam_update_output.rc not in [0, 1]
 
 - name: Install OPAM switches
   ansible.builtin.include_tasks: install_one_switch.yml
