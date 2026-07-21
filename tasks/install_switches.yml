@@ -3,6 +3,9 @@
     cmd: opam update -y
   become: true
   become_user: "{{ (opam_install_location == 'system_wide') | ternary('root', opam_user) }}"
+  environment:
+    OPAMROOT: "{{ (opam_install_location == 'system_wide') | ternary(opam_root_location_system_wide, opam_root_location_user) }}"
+    OPAMROOTISOK: "true"
   register: opam_update_output
   changed_when: "'no changes from' not in opam_update_output.stdout"
   failed_when: opam_update_output.rc != 0
