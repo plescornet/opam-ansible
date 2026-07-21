@@ -82,25 +82,21 @@
       become: true
       become_user: "{{ (opam_install_location == 'system_wide') | ternary('root', opam_user) }}"
       ansible.builtin.command:
-        cmd: opam install --confirm-level=unsafe-yes --color=never --switch={{ item.name }} --depext-only --dry-run {{ item.packages | join(' ') }}
-      register: opam_install_depext_output
+        cmd: >-
+          opam list --switch={{ item.name }} --external --resolve={{ item.packages | join(',') }}
+          --short
+      register: opam_external_dependencies
       changed_when: false
-
-    - name: Extract external dependencies - switch "{{ item.name }}"
-      ansible.builtin.set_fact:
-        required_packages: >-
-          {{ opam_install_depext_output.stdout_lines
-            | select('match', '^    ')
-            | map('regex_replace', '^    ', '')
-            | map('split', ' ')
-            | flatten }}
+      when: item.packages | length > 0
 
     - name: Install packages external dependencies - switch "{{ item.name }}"
       become: true
       ansible.builtin.package:
-        name: "{{ required_packages }}"
+        name: "{{ opam_external_dependencies.stdout_lines }}"
         state: present
-      changed_when: required_packages | length > 0
+      when:
+        - item.packages | length > 0
+        - opam_external_dependencies.stdout_lines | length > 0
 
     - name: Install packages - switch "{{ item.name }}"
       ansible.builtin.command:
