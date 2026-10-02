@@ -16,6 +16,36 @@
       ansible.builtin.set_fact:
         opam_switch_exists: "{{ item.name in opam_switch_list.stdout_lines }}"
 
+    - name: Determine compiler mismatch policy - switch "{{ item.name }}"
+      ansible.builtin.set_fact:
+        opam_switch_mismatch_policy: >-
+          {{ (item.compiler == 'latest')
+             | ternary(item.latest_mismatch | default(opam_latest_mismatch),
+                       item.compiler_mismatch | default('fail')) }}
+
+    - name: Validate compiler mismatch policy - switch "{{ item.name }}"
+      ansible.builtin.assert:
+        that:
+          - opam_switch_mismatch_policy in ['fail', 'skip', 'recreate']
+        fail_msg: >-
+          Mismatch policy for switch {{ item.name }} must be fail, skip, or
+          recreate.
+
+    - name: Resolve latest compiler version - switch "{{ item.name }}"
+      ansible.builtin.shell:
+        cmd: >-
+          set -o pipefail;
+          opam switch list-available --short
+          | grep '^ocaml-base-compiler\.'
+          | cut -d. -f2-
+          | sort -V
+          | tail -1
+      become: true
+      become_user: "{{ (opam_install_location == 'system_wide') | ternary('root', opam_user) }}"
+      register: opam_switch_latest_compiler
+      changed_when: false
+      when: item.compiler == 'latest'
+
     - name: Get installed compiler version - switch "{{ item.name }}"
       ansible.builtin.command:
         cmd: >-
@@ -27,30 +57,31 @@
       changed_when: false
       when:
         - opam_switch_exists
-        - item.compiler != 'latest'
+        - opam_switch_mismatch_policy != 'skip'
 
-    - name: Validate compiler mismatch policy - switch "{{ item.name }}"
-      ansible.builtin.assert:
-        that:
-          - item.compiler_mismatch | default('fail') in ['fail', 'skip', 'recreate']
-        fail_msg: >-
-          compiler_mismatch for switch {{ item.name }} must be fail, skip, or recreate.
-      when:
-        - opam_switch_exists
-        - item.compiler != 'latest'
-        - opam_switch_compiler.stdout != item.compiler
+    - name: Determine requested compiler - switch "{{ item.name }}"
+      ansible.builtin.set_fact:
+        opam_switch_requested_compiler: >-
+          {{ (opam_switch_latest_compiler.stdout | trim)
+             if item.compiler == 'latest' else item.compiler }}
+
+    - name: Detect compiler mismatch - switch "{{ item.name }}"
+      ansible.builtin.set_fact:
+        opam_switch_compiler_mismatch: >-
+          {{ false
+             if (not opam_switch_exists or opam_switch_mismatch_policy == 'skip')
+             else (opam_switch_compiler.stdout | trim) != opam_switch_requested_compiler }}
 
     - name: Fail for compiler mismatch - switch "{{ item.name }}"
       ansible.builtin.fail:
         msg: >-
-          Switch {{ item.name }} uses OCaml {{ opam_switch_compiler.stdout }}, but the
-          playbook requests {{ item.compiler }}. Set compiler_mismatch to skip to retain
-          the switch or recreate to remove and rebuild it.
+          Switch {{ item.name }} uses OCaml {{ opam_switch_compiler.stdout | trim }}, but the
+          playbook requests {{ opam_switch_requested_compiler }}. Set
+          {{ 'latest_mismatch' if item.compiler == 'latest' else 'compiler_mismatch' }} to skip
+          to retain the switch or recreate to remove and rebuild it.
       when:
-        - opam_switch_exists
-        - item.compiler != 'latest'
-        - opam_switch_compiler.stdout != item.compiler
-        - item.compiler_mismatch | default('fail') == 'fail'
+        - opam_switch_compiler_mismatch
+        - opam_switch_mismatch_policy == 'fail'
 
     - name: Remove switch with a different compiler - switch "{{ item.name }}"
       ansible.builtin.command:
@@ -58,10 +89,8 @@
       become: true
       become_user: "{{ (opam_install_location == 'system_wide') | ternary('root', opam_user) }}"
       when:
-        - opam_switch_exists
-        - item.compiler != 'latest'
-        - item.compiler_mismatch | default('fail') == 'recreate'
-        - opam_switch_compiler.stdout != item.compiler
+        - opam_switch_compiler_mismatch
+        - opam_switch_mismatch_policy == 'recreate'
 
     - name: Create switch - switch "{{ item.name }}"
       become: true
@@ -73,9 +102,8 @@
       when: >-
         not opam_switch_exists or
         (
-          item.compiler != 'latest' and
-          item.compiler_mismatch | default('fail') == 'recreate' and
-          opam_switch_compiler.stdout != item.compiler
+          opam_switch_compiler_mismatch and
+          opam_switch_mismatch_policy == 'recreate'
         )
 
     - name: Get external dependencies - switch "{{ item.name }}"

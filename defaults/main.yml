@@ -52,6 +52,14 @@ opam_switches: []
 default_switch: ""
 global_allow_invariant_updates: false
 
+# Policy for an existing switch declared with compiler 'latest' when the
+# installed compiler is older than the newest available one:
+#   skip     keep the switch untouched (historical behaviour)
+#   fail     abort the play like an explicit compiler mismatch
+#   recreate remove and rebuild the switch with the newest compiler
+# Can be overridden per switch with the latest_mismatch key.
+opam_latest_mismatch: skip
+
 #########################
 ### Post-installation ###
 #########################
@@ -67,6 +75,6 @@ jupyter_switch: "default"
 
 # VSCode
 configure_vscode: false
-vscode_executable_name: codium
+vscode_executable_name: code
 vscode_extensions:
   - "ocamllabs.ocaml-platform"

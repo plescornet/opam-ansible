@@ -25,7 +25,7 @@ The required variables are :
 
 You probably also want to set the following variables :
 
-- `opam_switches` : a list of switch to create and configure, each one should have a `name`, a `compiler` and a list of `packages` to install. The compiler should be a version string (e.g. "4.14.2") or `latest` for the newest compiler available from OPAM's configured repositories. `latest` is resolved only when creating a new switch and does not recreate existing switches. For an explicit compiler version mismatch, `compiler_mismatch` defaults to `fail`; set it to `skip` to retain the switch or `recreate` to remove and rebuild it. The packages should be a list of strings with the package name. The default is an empty list (no switch created). For example :
+- `opam_switches` : a list of switch to create and configure, each one should have a `name`, a `compiler` and a list of `packages` to install. The compiler should be a version string (e.g. "4.14.2") or `latest` for the newest compiler available from OPAM's configured repositories. `latest` is resolved when creating a new switch; for an existing switch, the `latest_mismatch` policy decides what happens when the installed compiler is older than the newest available one: `skip` (default, keeps the switch untouched), `fail` (aborts the play) or `recreate` (removes and rebuilds the switch with the newest compiler). For an explicit compiler version mismatch, `compiler_mismatch` defaults to `fail`; set it to `skip` to retain the switch or `recreate` to remove and rebuild it. The global default for `latest_mismatch` is the `opam_latest_mismatch` variable (default `skip`). The packages should be a list of strings with the package name. The default is an empty list (no switch created). For example :
   ```yaml
   opam_switches:
     - name: "default"
@@ -41,7 +41,7 @@ You probably also want to set the following variables :
         - ocaml-lsp-server
         - qcheck
   ```
-- `default_switch` : the name of the switch to set as the default. Default is `""`. If you don't set it, the ansible script will leave it .
+- `default_switch` : the name of the switch to set as the default. Default is `""`. If you don't set it, the role leaves opam's default switch unchanged.
 - `configure_vscode`, `configure_jupyter` and `configure_user_setup` are boolean variables that will configure the corresponding tools for the user. Default is `false` (no postinstall configuration, except eventually configuring the default switch).
 
 Dependencies
@@ -57,6 +57,10 @@ For a system-wide installation role assumes you are using `bash` and all users s
 ```shell
 opam init --shell=zsh
 ```
+
+Resolving `latest` uses GNU `sort -V`, so targets must be GNU/Linux (already the case for direct installations).
+
+With `latest_mismatch: recreate` (or `compiler_mismatch: recreate`), the existing switch is removed and rebuilt **before** the requested packages are resolved and installed. If one of the packages is not compatible with the new compiler (for instance not yet ported to a fresh OCaml release), the play fails at dependency resolution (`opam` exits with code 20 and a "no solution" diagnostic) and the machine is left with an empty switch and no packages. Recovery requires fixing the configuration (pin an explicit compiler version, or remove/update the incompatible package) and running the play again. For reproducible classroom machines, an explicit pinned compiler is therefore safer than `latest` with `recreate`.
 
 Example Playbook
 ----------------
