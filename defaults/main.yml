@@ -41,9 +41,8 @@ opam_install_location: system_wide
 opam_root_location_system_wide: /opt/opam
 
 # In case of user installation, the root location of the OPAM installation will be in the user's home directory and user-writable
-opam_root_location_user: "{{ ansible_env.HOME + '/.opam' }}"
-opam_user: "{{ ansible_user_id }}"
-
+opam_root_location_user: "{{ ansible_facts['env']['HOME'] + '/.opam' }}"
+opam_user: "{{ ansible_facts['user_id'] }}"
 #####################
 ### Opam packages ###
 #####################

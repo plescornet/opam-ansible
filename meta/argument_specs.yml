@@ -76,12 +76,12 @@ argument_specs:
 
       opam_root_location_user:
         type: str
-        default: "{{ ansible_env.HOME + '/.opam' }}"
+        default: "{{ ansible_facts['env']['HOME'] + '/.opam' }}"
         description: "Root directory for user OPAM installations."
 
       opam_user:
         type: str
-        default: "{{ ansible_user_id }}"
+        default: "{{ ansible_facts['user_id'] }}"
         description: "The user for user-level OPAM installations."
 
       opam_switches:
