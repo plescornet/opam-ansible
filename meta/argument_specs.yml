@@ -99,7 +99,7 @@ argument_specs:
           compiler:
             type: str
             required: true
-            description: "OCaml compiler version to be used in the switch, or latest for a newly created switch's newest available OCaml compiler."
+            description: "OCaml compiler version to be used in the switch, or latest for the newest available OCaml compiler (see latest_mismatch for existing switches)."
           compiler_mismatch:
             type: str
             choices:
@@ -108,6 +108,14 @@ argument_specs:
               - recreate
             default: fail
             description: "Action for an explicit compiler version mismatch: fail, skip, or recreate the switch."
+          latest_mismatch:
+            type: str
+            choices:
+              - fail
+              - skip
+              - recreate
+            default: skip
+            description: "Action when an existing latest switch is older than the newest available compiler: fail, skip, or recreate the switch (global default opam_latest_mismatch). Warning: recreate removes the old switch before packages are resolved, so an incompatible package leaves an empty switch."
           packages:
             type: list
             elements: str
@@ -122,6 +130,15 @@ argument_specs:
         type: bool
         default: false
         description: "Global flag to allow invariant updates during package upgrades."
+
+      opam_latest_mismatch:
+        type: str
+        choices:
+          - fail
+          - skip
+          - recreate
+        default: skip
+        description: "Global default policy when an existing latest switch is older than the newest available compiler."
 
       default_switch:
         type: str
