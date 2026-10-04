@@ -86,6 +86,35 @@ Example Playbook
               - ocaml-lsp-server
               - qcheck
 ```
+Troubleshooting
+---------------
+
+### `Recursive loop detected in template: maximum recursion depth exceeded`
+
+This error occurs when a wrapper role re-declares a role variable with the same name, for example:
+
+```yaml
+- name: Install opam
+  ansible.builtin.include_role:
+    name: plescornet.opam-ansible
+  vars:
+    opam_install_method: "{{ opam_install_method }}"   # recursion!
+```
+
+The `vars` entry shadows the role parameter, so the template resolves to itself indefinitely. If your wrapper role receives the value from its caller, simply omit the variable from `vars` (role parameters are inherited by included roles), or rename your wrapper's own parameter and pass the value explicitly:
+
+```yaml
+- name: Install opam
+  ansible.builtin.include_role:
+    name: plescornet.opam-ansible
+  vars:
+    opam_install_method: "{{ my_wrapper_opam_install_method }}"
+```
+
+### `ansible_env` is undefined or deprecated
+
+The role uses `ansible_facts['env']` and `ansible_facts['user_id']` instead of the deprecated `ansible_env` and `ansible_user_id` shorthands. Make sure the setup/gathering step has run so `ansible_facts` is populated.
+
 License
 -------
 
