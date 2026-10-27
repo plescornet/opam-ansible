@@ -5,7 +5,7 @@
     - name: Validate direct installation inputs
       ansible.builtin.assert:
         that:
-          - ansible_system == 'Linux'
+          - ansible_facts['system'] == 'Linux'
           - opam_direct_url | length > 0
           - opam_direct_url is match('^https://')
           - opam_direct_checksum is match('^sha256:[0-9a-fA-F]{64}$')
